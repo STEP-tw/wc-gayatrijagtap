@@ -1,3 +1,14 @@
+const { wc } = require('./src/lib');
+const fs = require('fs');
+
+const main = function () {
+  let file = process.argv[2];
+  console.log(wc(file, fs));
+}
+
+main();
+
+
 /* 
   Usage:
   node ./wc.js file1

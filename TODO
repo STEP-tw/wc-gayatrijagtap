@@ -1,2 +1,11 @@
 - add mocha and prettier in pre-commit  ✓
 - need to rename lib.js in src
+- implement default feature of wc  ✓
+- rename array in wc() lib.js  ✓
+- make a global vars file  ✓
+- introduce main in wc.js  ✓
+- move utility functions in seperate file
+- create formatOutput
+- add unit tests for utils
+- rename output in wc() lib.js
+- write shell script for manual testing

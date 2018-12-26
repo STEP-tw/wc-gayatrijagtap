@@ -5,7 +5,8 @@
   "main": "wc.js",
   "scripts": {
     "test": "mocha",
-    "prettier": "prettier --write **/*.js *.js"
+    "prettier": "prettier --write **/*.js *.js",
+    "start": "node wc.js wc.js"
   },
   "repository": {
     "type": "git",
