@@ -35,10 +35,26 @@ const parseInput = function (userArgs) {
     let options = ['l', 'w', 'c'];
     let fileName = userArgs[0];
     if (fileName.startsWith('-')) {
-        options = [userArgs[0].slice(1)];
+        options = userArgs[0].slice(1).split(EMPTY_STRING);
+        options = getOrderedOptions(options);
         fileName = userArgs[1];
     }
     return { options, fileName };
+}
+
+const getOrderedOptions = function (options) {
+    let order = new Object;
+    order['l'] = 1;
+    order['w'] = 2;
+    order['c'] = 3;
+    return orderOptions(order, options);
+}
+
+const orderOptions = function (order, options) {
+    optionsWithOrder = options.map(option => [order[option], option]);
+    optionsWithOrder.sort();
+    orderedOptions = optionsWithOrder.map(optionWithOrder => optionWithOrder[1]);
+    return orderedOptions;
 }
 
 const wc = function (userArgs, fs) {
