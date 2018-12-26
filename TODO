@@ -1,0 +1,2 @@
+- add mocha and prettier in pre-commit  ✓
+- need to rename lib.js in src
