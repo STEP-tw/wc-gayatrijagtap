@@ -2,8 +2,7 @@ const { wc } = require('./src/lib');
 const fs = require('fs');
 
 const main = function () {
-  let file = process.argv[2];
-  console.log(wc(file, fs));
+  console.log(wc(process.argv.slice(2), fs));
 }
 
 main();

@@ -10,3 +10,4 @@
 - rename output in wc() lib.js  ✓
 - write shell script for manual testing
 - rename counter
+- implement inputParser  ✓
