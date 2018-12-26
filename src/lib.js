@@ -33,13 +33,21 @@ const formatOutput = function (countArray, fileName) {
 
 const parseInput = function (userArgs) {
     let options = ['l', 'w', 'c'];
-    let fileName = userArgs[0];
-    if (fileName.startsWith('-')) {
-        options = userArgs[0].slice(1).split(EMPTY_STRING);
-        options = getOrderedOptions(options);
-        fileName = userArgs[1];
+    let files = userArgs;
+    if (userArgs[0].startsWith('-')) {
+        let { extractedOptions, fileIndex } = extractOptions(userArgs);
+        options = getOrderedOptions(extractedOptions);
+        files = userArgs.slice(fileIndex);
     }
-    return { options, fileName };
+    return { options, files };
+}
+
+const extractOptions = function (userArgs) {
+    let optionCandidates = userArgs.filter(arg => arg.startsWith('-'));
+    let fileIndex = optionCandidates.length;
+    optionCandidates = optionCandidates.map(option => option.slice(1));
+    extractedOptions = optionCandidates.join(EMPTY_STRING).split(EMPTY_STRING);
+    return { extractedOptions, fileIndex };
 }
 
 const getOrderedOptions = function (options) {
@@ -57,11 +65,17 @@ const orderOptions = function (order, options) {
     return orderedOptions;
 }
 
+const generateSingleFileCount = function (file, options, readFileSync) {
+    let fileContent = readFileSync(file, 'utf8');
+    let countArray = counter(fileContent, options);
+    let formatedOutput = formatOutput(countArray, file);
+    return formatedOutput;
+}
+
 const wc = function (userArgs, fs) {
-    let { options, fileName } = parseInput(userArgs);
-    let content = fs.readFileSync(fileName, 'utf8');
-    let countArray = counter(content, options);
-    let formatedOutput = formatOutput(countArray, fileName);
+    let { options, files } = parseInput(userArgs);
+    let formatedOutput = files.map(file => generateSingleFileCount(file, options, fs.readFileSync));
+    formatedOutput = formatedOutput.join('\n');
     return formatedOutput;
 }
 module.exports = { wc };

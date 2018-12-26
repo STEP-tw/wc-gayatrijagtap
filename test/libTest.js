@@ -45,4 +45,24 @@ describe('wc', function () {
         let expectedOutput = '\t5\t12 file';
         assert.deepEqual(actualOutput, expectedOutput);
     });
+    it('should return line and byte count when the options are specified seperately for single file', function () {
+        let actualOutput = wc(['-l', '-c', 'file'], fs);
+        let expectedOutput = '\t5\t12 file';
+        assert.deepEqual(actualOutput, expectedOutput);
+    });
+    it('should return byte and word count when the options are specified seperately for single file', function () {
+        let actualOutput = wc(['-c', '-w', 'file'], fs);
+        let expectedOutput = '\t6\t12 file';
+        assert.deepEqual(actualOutput, expectedOutput);
+    });
+    it('should return byte,line and word count when the options are specified seperately for single file', function () {
+        let actualOutput = wc(['-c', '-w', '-l', 'file'], fs);
+        let expectedOutput = '\t5\t6\t12 file';
+        assert.deepEqual(actualOutput, expectedOutput);
+    });
+    it('should return word,byte and line count when the options are specified seperately for single file', function () {
+        let actualOutput = wc(['-w', '-c', '-l', 'file'], fs);
+        let expectedOutput = '\t5\t6\t12 file';
+        assert.deepEqual(actualOutput, expectedOutput);
+    });
 })
