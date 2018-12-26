@@ -17,51 +17,69 @@ const countWords = (text) => splitByWhiteSpace(text)
     .filter(word => word != false)
     .length;
 
-const counter = function (content, options) {
-    let optionCount = new Object;
-    optionCount['l'] = countNewLines(content);
-    optionCount['c'] = countBytes(content);
-    optionCount['w'] = countWords(content);
-    return options.map(option => optionCount[option]);
+const count = {
+    'l': countNewLines,
+    'c': countBytes,
+    'w': countWords
 }
+
+const counter = (content, options) => options
+    .map(option => count[option](content));
 
 const formatOutput = function (countArray, fileName) {
     countArray.unshift(EMPTY_STRING);
-    let formatedOutput = countArray.join(TAB) + SPACE + fileName;
-    return formatedOutput;
+    return countArray.join(TAB) + SPACE + fileName;
 }
 
 const parseInput = function (userArgs) {
     let options = ['l', 'w', 'c'];
     let files = userArgs;
     if (userArgs[0].startsWith('-')) {
-        let { extractedOptions, fileIndex } = extractOptions(userArgs);
+        let { extractedOptions, fileStartingIndex } = extractOptions(userArgs);
         options = getOrderedOptions(extractedOptions);
-        files = userArgs.slice(fileIndex);
+        files = userArgs.slice(fileStartingIndex);
     }
     return { options, files };
 }
 
+const startsWithHyphen = (elements) => elements
+    .filter(element => element.startsWith('-'));
+
+const removeHyphen = (options) => options
+    .map(option => option.slice(1));
+
+const splitAndJoinByEmptyString = (contentArray) => contentArray
+    .join(EMPTY_STRING)
+    .split(EMPTY_STRING);
+
 const extractOptions = function (userArgs) {
-    let optionCandidates = userArgs.filter(arg => arg.startsWith('-'));
-    let fileIndex = optionCandidates.length;
-    optionCandidates = optionCandidates.map(option => option.slice(1));
-    extractedOptions = optionCandidates.join(EMPTY_STRING).split(EMPTY_STRING);
-    return { extractedOptions, fileIndex };
+    let optionsWithHyphen = startsWithHyphen(userArgs);
+    let fileStartingIndex = optionsWithHyphen.length;
+    optionsWithoutHyphen = removeHyphen(optionsWithHyphen);
+    let extractedOptions = splitAndJoinByEmptyString(optionsWithoutHyphen);
+    return { extractedOptions, fileStartingIndex };
+}
+
+const order = {
+    'l': 1,
+    'w': 2,
+    'c': 3
 }
 
 const getOrderedOptions = function (options) {
-    let order = new Object;
-    order['l'] = 1;
-    order['w'] = 2;
-    order['c'] = 3;
-    return orderOptions(order, options);
+    return orderOptions(options);
 }
 
-const orderOptions = function (order, options) {
-    optionsWithOrder = options.map(option => [order[option], option]);
+const mapOptionWithOrder = (options) => options
+    .map(option => [order[option], option]);
+
+const getOptions = (optionsWithOrder) => optionsWithOrder
+    .map(optionWithOrder => optionWithOrder[1]);
+
+const orderOptions = function (options) {
+    optionsWithOrder = mapOptionWithOrder(options);
     optionsWithOrder.sort();
-    orderedOptions = optionsWithOrder.map(optionWithOrder => optionWithOrder[1]);
+    orderedOptions = getOptions(optionsWithOrder);
     return orderedOptions;
 }
 
@@ -72,10 +90,14 @@ const generateSingleFileCount = function (file, options, readFileSync) {
     return formatedOutput;
 }
 
+const getFormattedOutput = (files, options, fs) => files
+    .map(file => generateSingleFileCount(file, options, fs.readFileSync));
+
 const wc = function (userArgs, fs) {
     let { options, files } = parseInput(userArgs);
-    let formatedOutput = files.map(file => generateSingleFileCount(file, options, fs.readFileSync));
+    let formatedOutput = getFormattedOutput(files, options, fs);
     formatedOutput = formatedOutput.join('\n');
     return formatedOutput;
 }
+
 module.exports = { wc };
