@@ -1,4 +1,4 @@
-const { SPACE, NEW_LINE, EMPTY_STRING, TAB } = require('./constants');
+const { HYPHEN, SPACE, NEW_LINE, EMPTY_STRING, TAB } = require('./constants');
 
 const countNewLines = (text) => text
     .split(NEW_LINE)
@@ -34,7 +34,7 @@ const formatOutput = function (countArray, fileName) {
 const parseInput = function (userArgs) {
     let options = ['l', 'w', 'c'];
     let files = userArgs;
-    if (userArgs[0].startsWith('-')) {
+    if (userArgs[0].startsWith(HYPHEN)) {
         let { extractedOptions, fileStartingIndex } = extractOptions(userArgs);
         options = getOrderedOptions(extractedOptions);
         files = userArgs.slice(fileStartingIndex);
@@ -43,12 +43,12 @@ const parseInput = function (userArgs) {
 }
 
 const startsWithHyphen = (elements) => elements
-    .filter(element => element.startsWith('-'));
+    .filter(element => element.startsWith(HYPHEN));
 
 const removeHyphen = (options) => options
     .map(option => option.slice(1));
 
-const splitAndJoinByEmptyString = (contentArray) => contentArray
+const joinAndSplitByEmptyString = (contentArray) => contentArray
     .join(EMPTY_STRING)
     .split(EMPTY_STRING);
 
@@ -56,7 +56,7 @@ const extractOptions = function (userArgs) {
     let optionsWithHyphen = startsWithHyphen(userArgs);
     let fileStartingIndex = optionsWithHyphen.length;
     optionsWithoutHyphen = removeHyphen(optionsWithHyphen);
-    let extractedOptions = splitAndJoinByEmptyString(optionsWithoutHyphen);
+    let extractedOptions = joinAndSplitByEmptyString(optionsWithoutHyphen);
     return { extractedOptions, fileStartingIndex };
 }
 
@@ -66,36 +66,54 @@ const order = {
     'c': 3
 }
 
-const getOrderedOptions = function (options) {
-    return orderOptions(options);
-}
-
 const mapOptionWithOrder = (options) => options
     .map(option => [order[option], option]);
 
 const getOptions = (optionsWithOrder) => optionsWithOrder
     .map(optionWithOrder => optionWithOrder[1]);
 
-const orderOptions = function (options) {
-    optionsWithOrder = mapOptionWithOrder(options);
+const getOrderedOptions = function (options) {
+    let optionsWithOrder = mapOptionWithOrder(options);
     optionsWithOrder.sort();
-    orderedOptions = getOptions(optionsWithOrder);
-    return orderedOptions;
+    return getOptions(optionsWithOrder);
 }
 
 const generateSingleFileCount = function (file, options, readFileSync) {
     let fileContent = readFileSync(file, 'utf8');
     let countArray = counter(fileContent, options);
-    let formatedOutput = formatOutput(countArray, file);
-    return formatedOutput;
+    return { countArray, file };
 }
 
-const getFormattedOutput = (files, options, fs) => files
-    .map(file => generateSingleFileCount(file, options, fs.readFileSync));
+const getCount = function (files, options, fs) {
+    let countWithFileName = files.map(file => generateSingleFileCount(file, options, fs.readFileSync));
+    if (files.length > 1) {
+        countWithFileName.push(getTotalCount(countWithFileName));
+    }
+    let formattedOutput = countWithFileName.map(countWithFileName => formatOutput(countWithFileName.countArray, countWithFileName.file));
+    return formattedOutput;
+}
+
+const arrayAddition = function (countArray) {
+    let totalCount = [];
+    for (let outerIndex = 0; outerIndex < countArray[0].length; outerIndex++) {
+        let sum = 0;
+        for (let innerIndex = 0; innerIndex < countArray.length; innerIndex++) {
+            sum = sum + countArray[innerIndex][outerIndex];
+        }
+        totalCount.push(sum);
+    }
+    return totalCount;
+}
+
+const getTotalCount = function (countWithFileName) {
+    let countArray = countWithFileName.map(singleCount => singleCount.countArray);
+    countArray = arrayAddition(countArray);
+    return { countArray, file: 'total' };
+}
 
 const wc = function (userArgs, fs) {
     let { options, files } = parseInput(userArgs);
-    let formatedOutput = getFormattedOutput(files, options, fs);
+    let formatedOutput = getCount(files, options, fs);
     formatedOutput = formatedOutput.join('\n');
     return formatedOutput;
 }
