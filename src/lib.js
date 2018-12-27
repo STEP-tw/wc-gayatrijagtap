@@ -36,16 +36,18 @@ const order = {
     'c': 3
 }
 
-const generateSingleFileCount = function (file, options, readFileSync) {
+const generateSingleFileCount = function (options, readFileSync, file) {
     let fileContent = readFileSync(file, UNICODE);
     let countArray = counter(fileContent, options);
     return { countArray, file };
 }
 
-const getCountWithFileNames = (files, options, fs) => files
-    .map(file => generateSingleFileCount(file, options, fs.readFileSync));
+const getCountWithFileNames = function (files, options, fs) {
+    let singleFileCountGenerator = generateSingleFileCount.bind(null, options, fs.readFileSync);
+    return files.map(singleFileCountGenerator);
+}
 
-const getCount = function (files, options, fs) {
+const getFormattedCount = function (files, options, fs) {
     let countWithFileNames = getCountWithFileNames(files, options, fs);
     if (files.length > 1) {
         countWithFileNames.push(getTotalCount(countWithFileNames));
@@ -65,7 +67,7 @@ const getTotalCount = function (countWithFileNames) {
 
 const wc = function (userArgs, fs) {
     let { options, files } = parseInput(userArgs);
-    let formatedOutput = getCount(files, options, fs);
+    let formatedOutput = getFormattedCount(files, options, fs);
     return formatedOutput.join('\n');
 }
 
