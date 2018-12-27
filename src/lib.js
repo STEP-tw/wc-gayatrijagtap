@@ -66,9 +66,8 @@ const getTotalCount = function (countWithFileNames) {
 }
 
 const wc = function (userArgs, fs) {
-    let { options, files } = parseInput(userArgs);
-    let formatedOutput = getFormattedCount(files, options, fs);
-    return formatedOutput.join('\n');
+    let { options, files, optionError } = parseInput(userArgs);
+    return optionError || getFormattedCount(files, options, fs).join('\n')
 }
 
 module.exports = { wc };

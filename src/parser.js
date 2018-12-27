@@ -7,6 +7,8 @@ const {
   removeDuplicates
 } = require('./util');
 
+const { handleErrors } = require('./errorHandler');
+
 const parseInput = function (userArgs) {
   let options = ['l', 'w', 'c'];
   let files = userArgs;
@@ -18,9 +20,10 @@ const parseInput = function (userArgs) {
 
 const extractInput = function (userArgs) {
   let { extractedOptions, fileStartingIndex } = extractOptions(userArgs);
+  let optionError = handleErrors(extractedOptions);
   let options = getOrderedOptions(extractedOptions);
   let files = userArgs.slice(fileStartingIndex);
-  return { options, files };
+  return { options, files, optionError };
 }
 
 const extractOptions = function (userArgs) {

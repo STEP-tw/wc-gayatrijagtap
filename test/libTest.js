@@ -91,4 +91,11 @@ describe('wc', function () {
         let expectedOutput = '\t5\t12 file';
         assert.deepEqual(actualOutput, expectedOutput);
     });
+    it('should return error for illegal option', function () {
+        let optionError = 'wc: illegal option -- ' + 's' + '\n' +
+            'usage: wc [-clmw] [file ...]';
+        let actualOutput = wc(['-sc', 'wl', 'file'], fs);
+        let expectedOutput = optionError;
+        assert.deepEqual(actualOutput, expectedOutput);
+    });
 })
