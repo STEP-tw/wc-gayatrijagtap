@@ -81,4 +81,14 @@ describe('wc', function () {
         let expectedOutput = '\t5\t12 file\n\t4\t9 file2\n\t9\t21 total';
         assert.deepEqual(actualOutput, expectedOutput);
     });
+    it('should return word count only once when option is repeatatively given for single file', function () {
+        let actualOutput = wc(['-ww', 'file'], fs);
+        let expectedOutput = '\t6 file';
+        assert.deepEqual(actualOutput, expectedOutput);
+    });
+    it('should return byte and line count only once when options are given repeatatively for single file', function () {
+        let actualOutput = wc(['-cl', '-ll', 'file'], fs);
+        let expectedOutput = '\t5\t12 file';
+        assert.deepEqual(actualOutput, expectedOutput);
+    });
 })

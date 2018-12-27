@@ -11,4 +11,4 @@
 - write shell script for manual testing
 - rename counter
 - implement inputParser  ✓
-- make seperate files for parser,formater,etc
+- make seperate files for parser,formater,etc  ✓
