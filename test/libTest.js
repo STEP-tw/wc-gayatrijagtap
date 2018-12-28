@@ -6,9 +6,15 @@ const files = {
     file2: '1\n2\n3\n4\n5'
 };
 
+const fileNames = ['file', 'file2'];
+
+const existsSync = function (fileName) {
+    return fileNames.includes(fileName);
+}
+
 const readFileSync = file => files[file];
 
-const fs = { readFileSync };
+const fs = { readFileSync, existsSync };
 
 describe('wc', function () {
     it('should return line,word and byte count and file name for single file', function () {
@@ -96,6 +102,20 @@ describe('wc', function () {
             'usage: wc [-clmw] [file ...]';
         let actualOutput = wc(['-sc', 'wl', 'file'], fs);
         let expectedOutput = optionError;
+        assert.deepEqual(actualOutput, expectedOutput);
+    });
+    it('should return error for single missing file', function () {
+        let missingFileError = '\twc: ' + 'file1' + ': open: No such file or directory';
+        let actualOutput = wc(['-c', 'file1'], fs);
+        let expectedOutput = missingFileError;
+        assert.deepEqual(actualOutput, expectedOutput);
+    });
+    it('should return error and total count for multiple missing files', function () {
+        let missingFile1Error = '\twc: ' + 'file1' + ': open: No such file or directory';
+        let missingFile3Error = '\n\twc: ' + 'file3' + ': open: No such file or directory';
+        let totalCount = '\n\t0 total';
+        let actualOutput = wc(['-c', 'file1', 'file3'], fs);
+        let expectedOutput = missingFile1Error + missingFile3Error + totalCount;
         assert.deepEqual(actualOutput, expectedOutput);
     });
 })

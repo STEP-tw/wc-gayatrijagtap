@@ -2,12 +2,15 @@ const { UNICODE, NEW_LINE, EMPTY_STRING } = require('./constants');
 
 const {
     splitByWhiteSpace,
-    arrayAddition
+    arrayAddition,
+    generateArray
 } = require('./util');
 
 const { parseInput } = require('./parser');
 
 const { getFormattedOutput } = require('./formatter');
+
+const { missingFileError } = require('./errorHandler');
 
 const countNewLines = (text) => text
     .split(NEW_LINE)
@@ -22,47 +25,53 @@ const countWords = (text) => splitByWhiteSpace(text)
     .length;
 
 const count = {
-    'l': countNewLines,
-    'c': countBytes,
-    'w': countWords
+    'line': countNewLines,
+    'byte': countBytes,
+    'word': countWords
 }
 
 const counter = (content, options) => options
     .map(option => count[option](content));
 
-const order = {
-    'l': 1,
-    'w': 2,
-    'c': 3
-}
-
-const generateSingleFileCount = function (options, readFileSync, file) {
-    let fileContent = readFileSync(file, UNICODE);
+const generateSingleFileCount = function (options, fs, file) {
+    if (!fs.existsSync(file)) {
+        return { error: missingFileError(file) };
+    }
+    let fileContent = fs.readFileSync(file, UNICODE);
     let countArray = counter(fileContent, options);
     return { countArray, file };
 }
 
 const getCountWithFileNames = function (files, options, fs) {
-    let singleFileCountGenerator = generateSingleFileCount.bind(null, options, fs.readFileSync);
-    return files.map(singleFileCountGenerator);
+    return files.map(generateSingleFileCount.bind(null, options, fs));
 }
 
 const getFormattedCount = function (files, options, fs) {
     let countWithFileNames = getCountWithFileNames(files, options, fs);
     if (files.length > 1) {
-        countWithFileNames.push(getTotalCount(countWithFileNames));
+        let totalCount = getTotalCount(options.length, getValidCountArrays(countWithFileNames));
+        countWithFileNames.push(totalCount);
     }
-    let formattedOutput = getFormattedOutput(countWithFileNames);
-    return formattedOutput;
+    return getFormattedOutput(countWithFileNames);
 }
+
+const getValidCountArrays = (countWithFileNames) => countWithFileNames
+    .filter(countWithFileName => !countWithFileName.error);
 
 const extractCountArray = (countWithFileNames) => countWithFileNames
     .map(countWithFileName => countWithFileName.countArray);
 
-const getTotalCount = function (countWithFileNames) {
+const getTotalCount = function (noOfOptions, countWithFileNames) {
     let countArray = extractCountArray(countWithFileNames);
+    if (countArray.length < 1) {
+        return getMissingFilesTotalCount(noOfOptions);
+    }
     countArray = arrayAddition(countArray);
     return { countArray, file: 'total' };
+}
+
+const getMissingFilesTotalCount = function (noOfOptions) {
+    return { countArray: generateArray(noOfOptions, 0), file: 'total' };
 }
 
 const wc = function (userArgs, fs) {

@@ -7,10 +7,10 @@ const {
   removeDuplicates
 } = require('./util');
 
-const { handleErrors } = require('./errorHandler');
+const { handleOptionError } = require('./errorHandler');
 
 const parseInput = function (userArgs) {
-  let options = ['l', 'w', 'c'];
+  let options = ['line', 'word', 'byte'];
   let files = userArgs;
   if (userArgs[0].startsWith(HYPHEN)) {
     return extractInput(userArgs);
@@ -20,8 +20,9 @@ const parseInput = function (userArgs) {
 
 const extractInput = function (userArgs) {
   let { extractedOptions, fileStartingIndex } = extractOptions(userArgs);
-  let optionError = handleErrors(extractedOptions);
-  let options = getOrderedOptions(extractedOptions);
+  let optionError = handleOptionError(extractedOptions);
+  let optionsWithoutMapping = getOrderedOptions(extractedOptions);
+  let options = mapOptionsToLineWordByte(optionsWithoutMapping);
   let files = userArgs.slice(fileStartingIndex);
   return { options, files, optionError };
 }
@@ -29,10 +30,19 @@ const extractInput = function (userArgs) {
 const extractOptions = function (userArgs) {
   let optionsWithHyphen = startsWithHyphen(userArgs);
   let fileStartingIndex = optionsWithHyphen.length;
-  optionsWithoutHyphen = removeHyphen(optionsWithHyphen);
+  let optionsWithoutHyphen = removeHyphen(optionsWithHyphen);
   let extractedOptions = joinAndSplitByEmptyString(optionsWithoutHyphen);
   return { extractedOptions, fileStartingIndex };
 }
+
+const optionsMapping = {
+  'l': 'line',
+  'w': 'word',
+  'c': 'byte'
+}
+
+const mapOptionsToLineWordByte = (options) => options
+  .map(option => optionsMapping[option]);
 
 const order = {
   'l': 1,

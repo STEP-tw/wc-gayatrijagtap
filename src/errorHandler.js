@@ -1,12 +1,25 @@
-const handleErrors = function (extractedOptions) {
-  let defaultOptions = ['c', 'w', 'l'];
-  let illegalOption = extractedOptions.filter(option => !defaultOptions.includes(option));
+const defaultOptions = ['c', 'w', 'l'];
+
+const usageMessage = 'usage: wc [-clmw] [file ...]';
+
+const missingFileError = function (file) {
+  return 'wc: ' + file + ': open: No such file or directory';
+}
+
+const handleOptionError = function (extractedOptions) {
+  let illegalOption = extractIllegalOptions(extractedOptions);
+  return getOptionError(illegalOption);
+}
+
+const getOptionError = function (illegalOption) {
   let optionError = '';
   if (illegalOption.length > 0) {
-    optionError = 'wc: illegal option -- ' + illegalOption[0] + '\n' +
-      'usage: wc [-clmw] [file ...]';
+    optionError = 'wc: illegal option -- ' + illegalOption[0] + '\n' + usageMessage;
   }
   return optionError;
 }
 
-module.exports = { handleErrors };
+const extractIllegalOptions = options => options
+  .filter(option => !defaultOptions.includes(option));
+
+module.exports = { handleOptionError, missingFileError };

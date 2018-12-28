@@ -1,6 +1,9 @@
 const { SPACE, EMPTY_STRING, TAB } = require('./constants');
 
-const formatOutput = function ({ countArray, file }) {
+const formatOutput = function ({ countArray, file, error }) {
+  if (error) {
+    return TAB + error;
+  }
   countArray.unshift(EMPTY_STRING);
   return countArray.join(TAB) + SPACE + file;
 }

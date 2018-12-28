@@ -5,8 +5,16 @@ const splitByWhiteSpace = (text) => text
   .join(SPACE)
   .split(SPACE);
 
-const startsWithHyphen = (elements) => elements
-  .filter(element => element.startsWith(HYPHEN));
+const startsWithHyphen = function (elements) {
+  let optionsWithHyphen = [];
+  for (let index = 0; index < elements.length; index++) {
+    if (!elements[index].startsWith(HYPHEN)) {
+      return optionsWithHyphen;
+    }
+    optionsWithHyphen.push(elements[index]);
+  }
+  return optionsWithHyphen;
+}
 
 const removeHyphen = (options) => options
   .map(option => option.slice(1));
@@ -15,16 +23,20 @@ const joinAndSplitByEmptyString = (contentArray) => contentArray
   .join(EMPTY_STRING)
   .split(EMPTY_STRING);
 
-const arrayAddition = function (countArray) {
-  let totalCount = [];
-  for (let outerIndex = 0; outerIndex < countArray[0].length; outerIndex++) {
-    let sum = 0;
-    for (let innerIndex = 0; innerIndex < countArray.length; innerIndex++) {
-      sum = sum + countArray[innerIndex][outerIndex];
-    }
-    totalCount.push(sum);
-  }
-  return totalCount;
+const generateArray = function (length, element) {
+  return new Array(length).fill(element);
+}
+
+const addArrays = function (array1, array2) {
+  let addition = [];
+  for (let index = 0; index < array1.length; index++) {
+    addition.push(array1[index] + array2[index]);
+  };
+  return addition;
+};
+
+const arrayAddition = function (arrayOfArray) {
+  return arrayOfArray.reduce(addArrays);
 }
 
 const findUniques = function (uniqueElements, element) {
@@ -43,5 +55,6 @@ module.exports = {
   removeHyphen,
   joinAndSplitByEmptyString,
   arrayAddition,
-  removeDuplicates
+  removeDuplicates,
+  generateArray
 };
