@@ -118,4 +118,9 @@ describe('wc', function () {
         let expectedOutput = missingFile1Error + missingFile3Error + totalCount;
         assert.deepEqual(actualOutput, expectedOutput);
     });
+    it('should return emptyString if the arguments consists of options only', function () {
+        let actualOutput = wc(['-c', '-l']);
+        let expectedOutput = '';
+        assert.deepEqual(actualOutput, expectedOutput);
+    });
 })

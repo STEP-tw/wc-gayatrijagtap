@@ -1,7 +1,7 @@
 const { HYPHEN } = require('./constants');
 
 const {
-  startsWithHyphen,
+  leadingElementsStartsWithCharacter,
   removeHyphen,
   joinAndSplitByEmptyString,
   removeDuplicates
@@ -13,13 +13,13 @@ const parseInput = function (userArgs) {
   let options = ['line', 'word', 'byte'];
   let files = userArgs;
   if (userArgs[0].startsWith(HYPHEN)) {
-    return extractInput(userArgs);
+    return extractArgs(userArgs);
   }
   return { options, files };
 }
 
-const extractInput = function (userArgs) {
-  let { extractedOptions, fileStartingIndex } = extractOptions(userArgs);
+const extractArgs = function (userArgs) {
+  let { extractedOptions, fileStartingIndex } = getOptions(userArgs);
   let optionError = handleOptionError(extractedOptions);
   let optionsWithoutMapping = getOrderedOptions(extractedOptions);
   let options = mapOptionsToLineWordByte(optionsWithoutMapping);
@@ -27,8 +27,8 @@ const extractInput = function (userArgs) {
   return { options, files, optionError };
 }
 
-const extractOptions = function (userArgs) {
-  let optionsWithHyphen = startsWithHyphen(userArgs);
+const getOptions = function (userArgs) {
+  let optionsWithHyphen = leadingElementsStartsWithCharacter(userArgs, HYPHEN);
   let fileStartingIndex = optionsWithHyphen.length;
   let optionsWithoutHyphen = removeHyphen(optionsWithHyphen);
   let extractedOptions = joinAndSplitByEmptyString(optionsWithoutHyphen);
@@ -53,13 +53,13 @@ const order = {
 const mapOptionWithOrder = (options) => options
   .map(option => [order[option], option]);
 
-const getOptions = (optionsWithOrder) => optionsWithOrder
+const extractOptionsFromOrder = (optionsWithOrder) => optionsWithOrder
   .map(optionWithOrder => optionWithOrder[1]);
 
 const getOrderedOptions = function (options) {
   let optionsWithOrder = mapOptionWithOrder(options);
   optionsWithOrder.sort();
-  options = getOptions(optionsWithOrder);
+  options = extractOptionsFromOrder(optionsWithOrder);
   return removeDuplicates(options);
 }
 

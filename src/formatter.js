@@ -1,14 +1,14 @@
 const { SPACE, EMPTY_STRING, TAB } = require('./constants');
 
-const formatOutput = function ({ countArray, file, error }) {
+const justifyOutput = function ({ countList, file, error }) {  //justifyOutput
   if (error) {
     return TAB + error;
   }
-  countArray.unshift(EMPTY_STRING);
-  return countArray.join(TAB) + SPACE + file;
+  countList.unshift(EMPTY_STRING);
+  return countList.join(TAB) + SPACE + file;
 }
 
-const getFormattedOutput = (countWithFileNames) => countWithFileNames
-  .map(formatOutput);
+const getJustifiedOutput = (countWithFileNames) => countWithFileNames
+  .map(justifyOutput);
 
-module.exports = { getFormattedOutput };
+module.exports = { getJustifiedOutput };

@@ -5,16 +5,6 @@ const splitByWhiteSpace = (text) => text
   .join(SPACE)
   .split(SPACE);
 
-const startsWithHyphen = function (elements) {
-  let optionsWithHyphen = [];
-  for (let index = 0; index < elements.length; index++) {
-    if (!elements[index].startsWith(HYPHEN)) {
-      return optionsWithHyphen;
-    }
-    optionsWithHyphen.push(elements[index]);
-  }
-  return optionsWithHyphen;
-}
 
 const removeHyphen = (options) => options
   .map(option => option.slice(1));
@@ -23,7 +13,7 @@ const joinAndSplitByEmptyString = (contentArray) => contentArray
   .join(EMPTY_STRING)
   .split(EMPTY_STRING);
 
-const generateArray = function (length, element) {
+const generateList = function (length, element) {
   return new Array(length).fill(element);
 }
 
@@ -49,12 +39,23 @@ const findUniques = function (uniqueElements, element) {
 const removeDuplicates = elements => elements
   .reduce(findUniques, []);
 
+const leadingElementsStartsWithCharacter = function (elements, character) {
+  let elementsStartsWithCharacter = [];
+  for (let index = 0; index < elements.length; index++) {
+    if (!elements[index].startsWith(character)) {
+      return elementsStartsWithCharacter;
+    }
+    elementsStartsWithCharacter.push(elements[index]);
+  }
+  return elementsStartsWithCharacter;
+}
+
 module.exports = {
   splitByWhiteSpace,
-  startsWithHyphen,
+  leadingElementsStartsWithCharacter,
   removeHyphen,
   joinAndSplitByEmptyString,
   arrayAddition,
   removeDuplicates,
-  generateArray
+  generateList
 };

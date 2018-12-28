@@ -3,12 +3,12 @@ const { UNICODE, NEW_LINE, EMPTY_STRING } = require('./constants');
 const {
     splitByWhiteSpace,
     arrayAddition,
-    generateArray
+    generateList
 } = require('./util');
 
 const { parseInput } = require('./parser');
 
-const { getFormattedOutput } = require('./formatter');
+const { getJustifiedOutput } = require('./formatter');
 
 const { missingFileError } = require('./errorHandler');
 
@@ -30,53 +30,53 @@ const count = {
     'word': countWords
 }
 
-const counter = (content, options) => options
-    .map(option => count[option](content));
+const counter = (fileContent, options) => options
+    .map(option => count[option](fileContent));
 
-const generateSingleFileCount = function (options, fs, file) {
+const generateFileCount = function (options, fs, file) {  //generateFileCount
     if (!fs.existsSync(file)) {
         return { error: missingFileError(file) };
     }
     let fileContent = fs.readFileSync(file, UNICODE);
-    let countArray = counter(fileContent, options);
-    return { countArray, file };
+    let countList = counter(fileContent, options);
+    return { countList, file };  //countList
 }
 
-const getCountWithFileNames = function (files, options, fs) {
-    return files.map(generateSingleFileCount.bind(null, options, fs));
+const getFilesCount = function (files, options, fs) {  //getFilesCount
+    return files.map(generateFileCount.bind(null, options, fs));
 }
 
-const getFormattedCount = function (files, options, fs) {
-    let countWithFileNames = getCountWithFileNames(files, options, fs);
+const formatOutput = function (files, options, fs) {  //formatOutput
+    let countWithFileNames = getFilesCount(files, options, fs);
     if (files.length > 1) {
-        let totalCount = getTotalCount(options.length, getValidCountArrays(countWithFileNames));
+        let totalCount = getTotalCount(options.length, getValidCountLists(countWithFileNames));
         countWithFileNames.push(totalCount);
     }
-    return getFormattedOutput(countWithFileNames);
+    return getJustifiedOutput(countWithFileNames);  //getJustifiedOutput
 }
 
-const getValidCountArrays = (countWithFileNames) => countWithFileNames
+const getValidCountLists = (countWithFileNames) => countWithFileNames  //getValidCountLists
     .filter(countWithFileName => !countWithFileName.error);
 
-const extractCountArray = (countWithFileNames) => countWithFileNames
-    .map(countWithFileName => countWithFileName.countArray);
+const extractCountList = (countWithFileNames) => countWithFileNames  //extractCountLists
+    .map(countWithFileName => countWithFileName.countList);
 
-const getTotalCount = function (noOfOptions, countWithFileNames) {
-    let countArray = extractCountArray(countWithFileNames);
-    if (countArray.length < 1) {
+const getTotalCount = function (noOfOptions, countWithFileNames) {  //countTotal
+    let countList = extractCountList(countWithFileNames);
+    if (countList.length < 1) {
         return getMissingFilesTotalCount(noOfOptions);
     }
-    countArray = arrayAddition(countArray);
-    return { countArray, file: 'total' };
+    countList = arrayAddition(countList);
+    return { countList, file: 'total' };
 }
 
-const getMissingFilesTotalCount = function (noOfOptions) {
-    return { countArray: generateArray(noOfOptions, 0), file: 'total' };
+const getMissingFilesTotalCount = function (noOfOptions) {  //countMissingFilesTotal
+    return { countList: generateList(noOfOptions, 0), file: 'total' };
 }
 
 const wc = function (userArgs, fs) {
     let { options, files, optionError } = parseInput(userArgs);
-    return optionError || getFormattedCount(files, options, fs).join('\n')
+    return optionError || formatOutput(files, options, fs).join('\n')
 }
 
 module.exports = { wc };
