@@ -11,6 +11,9 @@ const handleOptionError = function (extractedOptions) {
   return getOptionError(illegalOption);
 }
 
+const extractIllegalOptions = options => options
+  .filter(option => !defaultOptions.includes(option));
+
 const getOptionError = function (illegalOption) {
   let optionError = '';
   if (illegalOption.length > 0) {
@@ -18,8 +21,5 @@ const getOptionError = function (illegalOption) {
   }
   return optionError;
 }
-
-const extractIllegalOptions = options => options
-  .filter(option => !defaultOptions.includes(option));
 
 module.exports = { handleOptionError, missingFileError };
